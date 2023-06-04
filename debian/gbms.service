@@ -1,0 +1,22 @@
+[Unit]
+Description=GBMS Service
+
+After=syslog.target
+After=network.target
+After=mariadb.service
+
+[Service]
+Type=simple
+# If process dies it will be automatically restarted
+Restart=always
+
+WorkingDirectory=/var/www/html/gbms/
+ExecStartPre=/bin/mkdir -p /var/log/gbms/
+ExecStart=/var/www/html/gbms/gbms_server
+ExecStop=/bin/kill -s SIGTERM $MAINPID
+
+StandardOutput=append:/var/log/gbms/access.log
+StandardError=append:/var/log/gbms/error.log
+
+[Install]
+WantedBy=multi-user.target

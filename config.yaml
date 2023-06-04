@@ -1,0 +1,20 @@
+version: "0.1"
+server:
+  domain: "https://example.com"
+  port: 9480
+log:
+  filename: "gbms.log"
+  permissions: "0644"
+  level: debug
+  maxsize: 1
+  max_age: 30
+  max_backups: 5
+db:
+  host: "127.0.0.1"
+  port: 5432
+  user: "postgres"
+  pass: "tnfd5503"
+  database: "USDT_CAP"
+smtp:
+  host: "127.0.0.1"
+  from: "support@example.com"

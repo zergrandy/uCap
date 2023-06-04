@@ -1,0 +1,790 @@
+definitions:
+  account.CreateInfo:
+    properties:
+      active:
+        type: integer
+      email:
+        type: string
+      group:
+        items:
+          type: integer
+        type: array
+      login:
+        type: string
+      password:
+        type: string
+      remark:
+        type: string
+      username:
+        type: string
+    required:
+    - active
+    - email
+    - login
+    - password
+    - username
+    type: object
+  account.Forgot:
+    properties:
+      email:
+        example: example@example.com
+        type: string
+    type: object
+  account.UpdateUser:
+    properties:
+      active:
+        type: integer
+      email:
+        type: string
+      group:
+        items:
+          type: integer
+        type: array
+      id:
+        type: string
+      password:
+        type: string
+      remark:
+        type: string
+      username:
+        type: string
+    required:
+    - id
+    type: object
+  account.User:
+    properties:
+      active:
+        type: integer
+      email:
+        type: string
+      group:
+        items:
+          type: integer
+        type: array
+      id:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  account.login:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  controllers.JSONResult:
+    properties:
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  group.Group:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      permissions:
+        items:
+          type: integer
+        type: array
+      sub_groups:
+        items:
+          type: integer
+        type: array
+    required:
+    - name
+    type: object
+  group.GroupWindow:
+    properties:
+      groups_id:
+        items:
+          type: integer
+        type: array
+      user_id:
+        type: integer
+    required:
+    - groups_id
+    - user_id
+    type: object
+  group.UpdateGroup:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      permissions:
+        items:
+          type: integer
+        type: array
+      sub_groups:
+        items:
+          type: integer
+        type: array
+    required:
+    - name
+    type: object
+  permission.GrantPermission:
+    properties:
+      group_id:
+        type: integer
+      permissions:
+        items:
+          type: integer
+        type: array
+    required:
+    - group_id
+    - permissions
+    type: object
+  permission.Permission:
+    properties:
+      active:
+        type: integer
+      description:
+        type: string
+      slug:
+        type: string
+      title:
+        type: string
+    required:
+    - slug
+    - title
+    type: object
+  permission.UpdatePermission:
+    properties:
+      active:
+        type: integer
+      description:
+        type: string
+      id:
+        type: integer
+      slug:
+        type: string
+      title:
+        type: string
+    required:
+    - id
+    type: object
+  uav.CreateUAV:
+    properties:
+      active:
+        type: integer
+      brand:
+        type: string
+      location:
+        type: string
+      model:
+        type: string
+      name:
+        type: string
+      owner:
+        type: string
+      purchase:
+        type: string
+      remark:
+        type: string
+    required:
+    - active
+    - brand
+    - location
+    - model
+    - name
+    - owner
+    - purchase
+    type: object
+  uav.UAV:
+    properties:
+      active:
+        type: integer
+      brand:
+        type: string
+      created:
+        type: string
+      id:
+        type: integer
+      location:
+        type: string
+      maintenance:
+        type: string
+      model:
+        type: string
+      name:
+        type: string
+      owner:
+        type: string
+      purchase:
+        type: string
+      remark:
+        type: string
+      updated:
+        type: string
+    type: object
+  uav.UpdateUAV:
+    properties:
+      active:
+        type: integer
+      brand:
+        type: string
+      id:
+        type: integer
+      location:
+        type: string
+      maintenance:
+        type: string
+      model:
+        type: string
+      name:
+        type: string
+      owner:
+        type: string
+      remark:
+        type: string
+    required:
+    - id
+    type: object
+info:
+  contact:
+    name: cody chen
+    url: https://gbms.codychen.me/
+  description: Gin swagger
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: RancoDev GBMS API Docs
+  version: "1.0"
+paths:
+  /api/v1/account:
+    patch:
+      description: 更新該使用者的相關訊息
+      parameters:
+      - description: body data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/account.UpdateUser'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: no content
+        "500":
+          description: internal server error
+      summary: 更新用戶
+      tags:
+      - Account
+    post:
+      description: 創建一個使用者
+      parameters:
+      - description: body data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/account.CreateInfo'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: '{}'
+        "409":
+          description: create duplicates
+        "500":
+          description: internal server error
+      summary: 創建用戶
+      tags:
+      - Account
+  /api/v1/account/{id}:
+    delete:
+      description: 將使用者從系統中刪除
+      parameters:
+      - description: body data
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: no content
+        "500":
+          description: internal server error
+      summary: 用戶刪除
+      tags:
+      - Account
+    get:
+      description: 取得該使用者的相關資訊
+      parameters:
+      - description: body data
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/account.User'
+        "204":
+          description: no content
+        "500":
+          description: internal server error
+      summary: 用戶資訊
+      tags:
+      - Account
+  /api/v1/account/forgot:
+    post:
+      description: 會寄送忘記密碼的資訊至郵件
+      parameters:
+      - description: body data
+        in: body
+        name: email
+        required: true
+        schema:
+          $ref: '#/definitions/account.Forgot'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.JSONResult'
+      summary: 忘記密碼
+      tags:
+      - Account
+  /api/v1/accounts:
+    get:
+      description: 取得系統內所有的使用者資訊
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/account.User'
+            type: array
+        "204":
+          description: no content
+        "500":
+          description: internal server error
+      summary: 用戶列表
+      tags:
+      - Account
+  /api/v1/auth:
+    post:
+      description: 驗證帳號及密碼是否正確
+      parameters:
+      - description: body data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/account.login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.JSONResult'
+      summary: 帳號認證
+      tags:
+      - Account
+  /api/v1/group:
+    patch:
+      description: 更新群組的相關資訊
+      parameters:
+      - description: body data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/group.UpdateGroup'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: no content
+        "400":
+          description: paramenters error
+        "500":
+          description: internal server error
+      summary: 群組更新
+      tags:
+      - Group
+    post:
+      description: 建立一個群組
+      parameters:
+      - description: body data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/group.Group'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: '{}'
+        "409":
+          description: create duplicates
+        "500":
+          description: internal server error
+      summary: 創建群組
+      tags:
+      - Group
+  /api/v1/group/{group_id}:
+    get:
+      description: 取得單一群組的詳細資料
+      parameters:
+      - description: group id
+        example: 123
+        in: path
+        name: group_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/group.Group'
+        "400":
+          description: paramenters error
+        "500":
+          description: internal server error
+      summary: 群組資訊
+      tags:
+      - Group
+  /api/v1/group/{id}:
+    put:
+      description: 單一使用者改變擁有群組
+      parameters:
+      - description: body data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/group.GroupWindow'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: no content
+        "400":
+          description: user not found
+        "500":
+          description: internal server error
+      summary: 加入群組
+      tags:
+      - Group
+  /api/v1/group/remove_group/{gid}:
+    delete:
+      description: 將該群組移除
+      parameters:
+      - description: group id
+        example: 123
+        in: path
+        name: gid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: no content
+        "400":
+          description: group not found
+        "500":
+          description: internal server error
+      summary: 群組刪除
+      tags:
+      - Group
+  /api/v1/group/remove_user:
+    delete:
+      description: 將使用者從該群組移除
+      parameters:
+      - description: body data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/group.GroupWindow'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: no content
+        "500":
+          description: internal server error
+      summary: 移除群組使用者
+      tags:
+      - Group
+  /api/v1/groups:
+    get:
+      description: 取得所有的群組列表，其中包含詳細資料
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/group.Group'
+            type: array
+        "204":
+          description: no content
+        "500":
+          description: internal server error
+      summary: 群組列表
+      tags:
+      - Group
+  /api/v1/healthcheck:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.JSONResult'
+      security:
+      - Bearer: []
+      summary: 健康檢查
+      tags:
+      - System
+  /api/v1/permission:
+    patch:
+      description: 更新權限中異動的資訊，將以當下設定更新群組
+      parameters:
+      - description: body data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/permission.UpdatePermission'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: no content
+        "500":
+          description: internal server error
+      summary: 權限更新
+      tags:
+      - Permission
+    post:
+      description: 建立一個權限，以配合前端設計頁面、功能等
+      parameters:
+      - description: body data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/permission.Permission'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: '{}'
+        "409":
+          description: request conflict
+        "500":
+          description: internal server error
+      summary: 創建權限
+      tags:
+      - Permission
+  /api/v1/permission/{pid}:
+    delete:
+      description: 將權限從系統中刪除
+      parameters:
+      - description: permission id
+        example: 123
+        in: path
+        name: pid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: no content
+        "500":
+          description: internal server error
+      summary: 權限刪除
+      tags:
+      - Permission
+    get:
+      description: 取得單一權限的詳細資訊
+      parameters:
+      - description: permission id
+        example: 123
+        in: path
+        name: pid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/permission.Permission'
+        "500":
+          description: internal server error
+      summary: 權限資訊
+      tags:
+      - Permission
+  /api/v1/permission/grant:
+    put:
+      description: 權限賦予指定群組，將以當下設定的權限賦予群組
+      parameters:
+      - description: body data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/permission.GrantPermission'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: no content
+        "500":
+          description: internal server error
+      summary: 權限賦予
+      tags:
+      - Permission
+  /api/v1/permissions:
+    get:
+      description: 取得所有權限的列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/permission.Permission'
+            type: array
+        "500":
+          description: internal server error
+      summary: 權限列表
+      tags:
+      - Permission
+  /api/v1/uav:
+    patch:
+      description: 建立一個無人機物件
+      parameters:
+      - description: body data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/uav.UpdateUAV'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: '{}'
+        "409":
+          description: create duplicates
+      summary: 更新無人機
+      tags:
+      - UAV
+    post:
+      description: 建立一個無人機物件
+      parameters:
+      - description: body data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/uav.CreateUAV'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: '{}'
+        "409":
+          description: create duplicates
+      summary: 創建無人機
+      tags:
+      - UAV
+  /api/v1/uav/{id}:
+    delete:
+      description: 建立一個無人機物件
+      parameters:
+      - description: body data
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: '{}'
+        "409":
+          description: create duplicates
+      summary: 刪除無人機
+      tags:
+      - UAV
+    get:
+      description: 建立一個無人機物件
+      parameters:
+      - description: body data
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/uav.UAV'
+        "409":
+          description: create duplicates
+      summary: 無人機資訊
+      tags:
+      - UAV
+  /api/v1/uavs:
+    get:
+      description: 建立一個無人機物件
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/uav.UAV'
+            type: array
+        "409":
+          description: create duplicates
+      summary: 無人機列表
+      tags:
+      - UAV
+securityDefinitions:
+  Bearer:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
