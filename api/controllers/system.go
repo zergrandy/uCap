@@ -23,6 +23,6 @@ func Healthcheck(c *gin.Context) {
 
 func PING(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"PONG": time.Now(),
+		"PONG": time.Now().UTC().Add(8 * time.Hour),
 	})
 }

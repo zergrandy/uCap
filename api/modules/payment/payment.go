@@ -157,13 +157,13 @@ func getUuid() string {
 }
 
 func getDtNow() string {
-	now := time.Now()
+	now := time.Now().UTC().Add(8 * time.Hour)
 	timeString := now.Format("2006-01-02 15:04:05")
 	return timeString
 }
 
 func getDtLimit() string {
-	now := time.Now()
+	now := time.Now().UTC().Add(8 * time.Hour)
 	afterHalfHour := now.Add(30 * time.Minute)
 	timeString := afterHalfHour.Format("2006-01-02 15:04:05")
 	return timeString
