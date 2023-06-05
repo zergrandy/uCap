@@ -2,6 +2,8 @@ package payment
 
 import (
 	"fmt"
+	"net/http"
+	"strconv"
 
 	payment "github.com/Ranco-dev/gbms/api/modules/payment"
 	"github.com/gin-gonic/gin"
@@ -18,21 +20,32 @@ import (
 // @Failure			500		"internal server error"
 // @Router			/api/v1/group [post]
 
+func isNumeric(str string) bool {
+	_, err := strconv.ParseFloat(str, 64)
+	return err == nil
+}
+
 func PymReq(c *gin.Context) {
 	fmt.Println("PymReq")
 	userId := c.Param("uid")
 	amount := c.Param("amount")
 	fmt.Println(userId)
 	fmt.Println(amount)
-	if address, code, err := payment.PaymentReq(userId, amount); err == nil {
-		c.JSON(code, gin.H{
-			"msg":     "OK",
-			"address": address,
+	if !isNumeric(amount) {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"msg": "amount is not number",
 		})
 	} else {
-		c.JSON(code, gin.H{
-			"msg": err.Error(),
-		})
+		if address, code, err := payment.PaymentReq(userId, amount); err == nil {
+			c.JSON(code, gin.H{
+				"msg":     "OK",
+				"address": address,
+			})
+		} else {
+			c.JSON(code, gin.H{
+				"msg": err.Error(),
+			})
+		}
 	}
 }
 

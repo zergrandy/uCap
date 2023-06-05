@@ -34,10 +34,10 @@ func PaymentReq(userId string, amount string) (Address, int, error) {
 
 	//會先查詢 _address 中該 user_id 是否有地址了
 	var addressCheck AddressCheck
-	sqlQry := "SELECT count(id) as countt FROM _address where user_id = '" + userId + "'"
+
+	sqlQry := "SELECT count(id) as countt FROM _address where user_id = $1"
 	fmt.Println(sqlQry)
-	err := db.Conn.QueryRow(ctx, sqlQry).Scan(
-		&addressCheck.Countt)
+	err := db.Conn.QueryRow(ctx, sqlQry, userId).Scan(&addressCheck.Countt)
 	if err != nil {
 		log.Sugar.Errorf("PaymentReq get address err: %s", err)
 		return address, http.StatusInternalServerError, err
@@ -52,10 +52,8 @@ func PaymentReq(userId string, amount string) (Address, int, error) {
 		}
 		defer tx.Rollback(ctx)
 
-		updateQry := fmt.Sprintf("UPDATE _address SET user_id = '%s' WHERE index = ( SELECT MIN(index) FROM _address WHERE user_id = '' );", userId)
-		fmt.Println(updateQry)
-
-		if _, err = tx.Exec(ctx, updateQry); err != nil {
+		updateQry := "UPDATE _address SET user_id = $1 WHERE index = ( SELECT MIN(index) FROM _address WHERE user_id = '' )"
+		if _, err = tx.Exec(ctx, updateQry, userId); err != nil {
 			log.Sugar.Errorf("PaymentReq UPDATE address err: %s", err)
 			return address, http.StatusInternalServerError, err
 		}
@@ -71,10 +69,8 @@ func PaymentReq(userId string, amount string) (Address, int, error) {
 		}
 		defer tx.Rollback(ctx)
 
-		updateQry := fmt.Sprintf("UPDATE _payment_req set status = 'closed' WHERE id in ( SELECT id FROM _payment_req WHERE user_id = '%s' and status = 'pending' );", userId)
-		fmt.Println(updateQry)
-
-		if _, err = tx.Exec(ctx, updateQry); err != nil {
+		updateQry := "UPDATE _payment_req set status = 'closed' WHERE id in ( SELECT id FROM _payment_req WHERE user_id = $1 and status = 'pending' )"
+		if _, err = tx.Exec(ctx, updateQry, userId); err != nil {
 			log.Sugar.Errorf("PaymentReq update paymentReq err: %s", err)
 			return address, http.StatusInternalServerError, err
 		}
@@ -103,13 +99,11 @@ func PaymentReq(userId string, amount string) (Address, int, error) {
 	initWalletBalanceResult := fmt.Sprintf("%.6f", initWalletBalanceFloat)
 
 	tx, err := db.Conn.Begin(ctx)
-	insertQry := "INSERT INTO _payment_req " +
-		" (id, create_date, create_user, modify_date, modify_user, " +
-		"	status, req_date, user_id, user_ip, amount, start_balance, end_balance, comment, address) " +
-		fmt.Sprintf("values ('%s', '%s', 'program', '%s', 'program', 'pending', '%s', '%s', '', '%s', '%s', '', '', '%s')", uuid, dtNow, dtNow, dtNow, userId, amount, initWalletBalanceResult, addressString)
+	insertQry := `INSERT INTO _payment_req 
+				(id, create_date, create_user, modify_date, modify_user, status, req_date, user_id, user_ip, amount, start_balance, end_balance, comment, address) 
+				values ($1, $2, 'program', $3, 'program', 'pending', $4, $5, '', $6, $7, '', '', $8)`
 
-	fmt.Println("insertQry " + insertQry)
-	if _, err = tx.Exec(ctx, insertQry); err != nil {
+	if _, err = tx.Exec(ctx, insertQry, uuid, dtNow, dtNow, dtNow, userId, amount, initWalletBalanceResult, addressString); err != nil {
 		fmt.Println("err " + err.Error())
 		log.Sugar.Errorf("PaymentReq INSERT paymentReq err: %s", err)
 		return address, http.StatusInternalServerError, err
@@ -134,10 +128,8 @@ func PaymentCheck(taskId string) (string, int, error) {
 
 	//會先查詢 _address 中該 user_id 是否有地址了
 	var taskStatus string
-	sqlQry := "SELECT status FROM _payment_req where id = '" + taskId + "'"
-	//fmt.Println(sqlQry)
-	err := db.Conn.QueryRow(ctx, sqlQry).Scan(
-		&taskStatus)
+	sqlQry := "SELECT status FROM _payment_req where id = $1"
+	err := db.Conn.QueryRow(ctx, sqlQry, taskId).Scan(&taskStatus)
 	if err != nil {
 		log.Sugar.Errorf("PaymentCheck db.Conn.QueryRow err: %s", err)
 		return taskStatus, http.StatusInternalServerError, err
