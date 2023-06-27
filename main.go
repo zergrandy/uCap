@@ -16,6 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/Ranco-dev/gbms/api/controllers"
+	invade "github.com/Ranco-dev/gbms/api/controllers/invade"
 	payment "github.com/Ranco-dev/gbms/api/controllers/payment"
 	"github.com/Ranco-dev/gbms/pkg/config"
 
@@ -92,10 +93,14 @@ func setupRouter() (router *gin.Engine) {
 
 func routeURL(r *gin.Engine) {
 	r.GET("api/v1/ping", controllers.PING)
+	r.GET("api/v1/ping2", controllers.PING)
 
 	//payment request
 	r.GET("api/v1/pymReq/:uid/:amount", payment.PymReq)
 	r.GET("api/v1/pymCheck/:tid", payment.PymCheck)
+
+	//invade log luke
+	r.GET("api/v1/invade/:value", invade.InvadeLog)
 
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(404, gin.H{

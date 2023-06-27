@@ -18,3 +18,11 @@ apt-get install postgresql-client postgresql-client-common
 ```bash
 make test
 ```
+
+
+## 
+```bash
+Go mod tidy
+go build
+./gbms > /dev/null 2>&1 &
+```
