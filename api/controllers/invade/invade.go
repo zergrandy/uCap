@@ -24,6 +24,22 @@ func isNumeric(str string) bool {
 	return err == nil
 }
 
+func GetInvadeLogLast(c *gin.Context) {
+	fmt.Println("GetInvadeLogLast")
+	secondDigit := c.Param("secondDigit")
+
+	if result, code, err := invade.GetInvadeLogLast(secondDigit); err == nil {
+		c.JSON(code, gin.H{
+			"msg":    "OK",
+			"result": result,
+		})
+	} else {
+		c.JSON(code, gin.H{
+			"msg": err.Error(),
+		})
+	}
+}
+
 func InvadeLog(c *gin.Context) {
 	fmt.Println("InvadeLog")
 	value := c.Param("value")

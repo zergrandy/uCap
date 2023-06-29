@@ -15,14 +15,38 @@ import (
 	"github.com/google/uuid"
 )
 
-type AddressCheck struct {
-	Countt string `form:"Countt" json:"Countt,omitempty" swaggerignore:"true"`
+type InvadeObj struct {
+	CreateDate time.Time `form:"CreateDate" json:"CreateDate,omitempty" swaggerignore:"true"`
+	Value      string    `form:"Value" json:"Value,omitempty" swaggerignore:"true"`
 }
 
 type Address struct {
 	TaskId        string `form:"TaskId" json:"TaskId,omitempty" swaggerignore:"true"`
 	DateTimeLimit string `form:"DateTimeLimit" json:"DateTimeLimit,omitempty" swaggerignore:"true"`
 	Address       string `form:"Address" json:"Address,omitempty" swaggerignore:"true"`
+}
+
+func GetInvadeLogLast(second_digit string) (InvadeObj, int, error) {
+	var ctx = context.Background()
+	var invadeObj InvadeObj
+
+	sqlQry := `WITH second_digit_1 AS (
+									SELECT * FROM _invade_log
+									WHERE SUBSTRING(value, 2, 1) = $1
+									ORDER BY create_date DESC
+									LIMIT 1
+								)
+								
+								SELECT create_date as CreateDate, value FROM second_digit_1
+								ORDER BY CreateDate DESC; `
+
+	err := db.Conn.QueryRow(ctx, sqlQry, second_digit).Scan(&invadeObj.CreateDate, &invadeObj.Value)
+	if err != nil {
+		log.Sugar.Errorf("GetInvadeLogLast err: %s", err)
+		return invadeObj, http.StatusInternalServerError, err
+	}
+
+	return invadeObj, http.StatusOK, nil
 }
 
 func InvadeLog(value string) (string, int, error) {

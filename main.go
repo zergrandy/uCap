@@ -101,6 +101,7 @@ func routeURL(r *gin.Engine) {
 
 	//invade log luke
 	r.GET("api/v1/invade/:value", invade.InvadeLog)
+	r.GET("api/v1/invadeGet/:secondDigit", invade.GetInvadeLogLast)
 
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(404, gin.H{
